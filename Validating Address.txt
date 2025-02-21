@@ -13,7 +13,7 @@ Sub ValidateAddress()
     Dim documents As Object
     Dim doc As Object
 
-    ' 암호화된 API 키를 복호화
+    ' 카카오 API 키
     apiKey = "YOUR_KAKAO_API_KEY"
     
     ' 워크시트 설정
