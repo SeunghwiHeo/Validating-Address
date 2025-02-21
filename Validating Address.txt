@@ -19,15 +19,15 @@ Sub ValidateAddress()
     ' 워크시트 설정
     Set ws = ThisWorkbook.Sheets(1) ' 
     
-    ' 주소 열에서 마지막 행 찾기
-    lastRow = ws.Cells(ws.Rows.Count, "E").End(xlUp).Row
+    ' 주소 열(B열)에서 마지막 행 찾기
+    lastRow = ws.Cells(ws.Rows.Count, "B").End(xlUp).Row
     
     address = ""
     
     ' 반복문
     For i = 2 To lastRow ' 2번 행부터 마지막 행까지 반복
-        ' 주소 열에서 주소 가져오기
-        address = ws.Cells(i, "E").Value
+        ' 주소 열(B열)에서 주소 가져오기
+        address = ws.Cells(i, "B").Value
         
         ' 주소 값이 있을때 API 호출
         If address <> "" Then
@@ -72,8 +72,8 @@ Sub ValidateAddress()
                 result = "X"
             End If
             
-            ' 결과 열에 결과값 출력
-            ws.Cells(i, "N").Value = result
+            ' 결과 열(C열)에 결과값 출력
+            ws.Cells(i, "C").Value = result
 
         End If
         
