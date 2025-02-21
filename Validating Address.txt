@@ -1,0 +1,84 @@
+Sub ValidateAddress()
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim address As String
+    Dim apiKeyEncrypted As String
+    Dim apiKey As String
+    Dim url As String
+    Dim result As String
+    Dim http As Object
+    Dim response As String
+    Dim i As Long
+    Dim json As Object
+    Dim documents As Object
+    Dim doc As Object
+
+    ' 암호화된 API 키를 복호화
+    apiKey = "YOUR_KAKAO_API_KEY"
+    
+    ' 워크시트 설정
+    Set ws = ThisWorkbook.Sheets(1) ' 
+    
+    ' 주소 열에서 마지막 행 찾기
+    lastRow = ws.Cells(ws.Rows.Count, "E").End(xlUp).Row
+    
+    address = ""
+    
+    ' 반복문
+    For i = 2 To lastRow ' 2번 행부터 마지막 행까지 반복
+        ' 주소 열에서 주소 가져오기
+        address = ws.Cells(i, "E").Value
+        
+        ' 주소 값이 있을때 API 호출
+        If address <> "" Then
+            ' 카카오 주소 검색 API URL 생성
+            url = "https://dapi.kakao.com/v2/local/search/address.json?query=" & WorksheetFunction.EncodeURL(address)
+            
+            ' HTTP 요청 객체 생성 
+            Set http = CreateObject("MSXML2.XMLHTTP")
+            
+            ' 카카오 API 호출
+            http.Open "GET", url, False
+            http.setRequestHeader "Authorization", apiKey
+            http.setRequestHeader "Content-Type", "application/json"
+            http.Send
+            
+            ' API 응답 받기
+            response = http.responseText
+            
+            ' documents 필드의 길이를 체크하여 유효한 주소인지 확인
+            If InStr(response, """documents"":") > 0 Then
+                ' JSON 파싱
+                Set json = JsonConverter.ParseJson(response)
+                Set documents = json("documents")
+                
+                ' 배열이 비어있지 않으면 유효한 주소로 간주
+                If documents.Count > 0 Then
+                    ' 첫 번째 document 가져오기
+                    Set doc = documents(1)
+                    
+                    ' "road_address"가 존재하는지 확인
+                    If Not IsNull(doc("road_address")) Then
+                        ' "road_address"가 null이 아니면 유효한 주소로 "O" 표시
+                        result = "O"
+                    Else
+                        ' "road_address"가 없으면 무효한 주소로 "X" 표시
+                        result = "X"
+                    End If
+                Else
+                    result = "X"
+                End If
+            Else
+                result = "X"
+            End If
+            
+            ' 결과 열에 결과값 출력
+            ws.Cells(i, "N").Value = result
+
+        End If
+        
+        address = ""
+
+    Next i
+    
+
